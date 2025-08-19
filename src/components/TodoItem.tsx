@@ -13,7 +13,9 @@ type Props = {
 const TodoItem = ({ todo }: Props) => {
   return (
     <li className="p-3">
-      <div className="flex justify-between items-center"></div>
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-2"></div>
+      </div>
     </li>
   );
 };
