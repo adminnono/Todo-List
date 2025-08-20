@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import TodoItem from "./components/TodoItem";
+import { Construction } from "lucide-react";
 
 type Priority = "Urgente" | "Moyenne" | "Basse";
 
@@ -16,6 +17,7 @@ const App: React.FC = () => {
   const initialTodos = savedTodos ? JSON.parse(savedTodos) : [];
   const [todos, setTodos] = useState<Todo[]>(initialTodos);
   const [filter, setFilter] = useState<Priority | "Tous">("Tous");
+  const [selectedTodos, setSelectedTodos] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(todos));
@@ -44,6 +46,23 @@ const App: React.FC = () => {
     filteredTodos = todos;
   } else {
     filteredTodos = todos.filter((todo) => todo.priority === filter);
+  }
+
+  const urgentCount = todos.filter((t) => t.priority === "Urgente").length;
+  const mediumCount = todos.filter((t) => t.priority === "Moyenne").length;
+  const lowCount = todos.filter((t) => t.priority === "Basse").length;
+  const totalCount = todos.length;
+
+  function deleteTodo(id: number) {
+    const newTodos = todos.filter((todo) => todo.id !== id);
+    setTodos(newTodos);
+  }
+
+  function toggleSelectTodo(id: number) {
+    const newSelected = new Set(selectedTodos);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    }
   }
 
   return (
@@ -78,7 +97,31 @@ const App: React.FC = () => {
               }`}
               onClick={() => setFilter("Tous")}
             >
-              Tous
+              Tous({totalCount})
+            </button>
+            <button
+              className={`btn btn-soft ${
+                filter === "Urgente" ? "btn-primary" : ""
+              }`}
+              onClick={() => setFilter("Urgente")}
+            >
+              Urgente({urgentCount})
+            </button>
+            <button
+              className={`btn btn-soft ${
+                filter === "Moyenne" ? "btn-primary" : ""
+              }`}
+              onClick={() => setFilter("Moyenne")}
+            >
+              Moyenne({mediumCount})
+            </button>
+            <button
+              className={`btn btn-soft ${
+                filter === "Basse" ? "btn-primary" : ""
+              }`}
+              onClick={() => setFilter("Basse")}
+            >
+              Basse({lowCount})
             </button>
           </div>
 
@@ -86,12 +129,24 @@ const App: React.FC = () => {
             <ul className="divide-y divide-primary/20">
               {filteredTodos.map((todo) => (
                 <li key={todo.id}>
-                  <TodoItem todo={todo} />
+                  <TodoItem
+                    todo={todo}
+                    onDelete={() => deleteTodo(todo.id)}
+                    isSelected={selectedTodos.has(todo.id)}
+                  />
                 </li>
               ))}
             </ul>
           ) : (
-            <div>Test</div>
+            <div className="flex justify-center items-center flex-col p-5">
+              <div>
+                <Construction
+                  className="w-40 h-40 text-primary"
+                  strokeWidth={1}
+                />
+              </div>
+              <p className="text-sm">Aucune tâche pour ce filtre</p>
+            </div>
           )}
         </div>
       </div>
