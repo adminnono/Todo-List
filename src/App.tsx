@@ -62,7 +62,22 @@ const App: React.FC = () => {
     const newSelected = new Set(selectedTodos);
     if (newSelected.has(id)) {
       newSelected.delete(id);
+    } else {
+      newSelected.add(id);
     }
+    setSelectedTodos(newSelected);
+  }
+
+  function finishSelected() {
+    const newTodos = todos.filter((todo) => {
+      if (selectedTodos.has(todo.id)) {
+        return false;
+      } else {
+        return true;
+      }
+    });
+    setTodos(newTodos);
+    setSelectedTodos(new Set());
   }
 
   return (
@@ -90,38 +105,47 @@ const App: React.FC = () => {
           </button>
         </div>
         <div className="space-y-2 flex-1 h-fit">
-          <div className="flex flex-wrap gap-4">
+          <div className="flex items-center justify-between">
+            <div className="flex flex-wrap gap-4">
+              <button
+                className={`btn btn-soft ${
+                  filter === "Tous" ? "btn-primary" : ""
+                }`}
+                onClick={() => setFilter("Tous")}
+              >
+                Tous({totalCount})
+              </button>
+              <button
+                className={`btn btn-soft ${
+                  filter === "Urgente" ? "btn-primary" : ""
+                }`}
+                onClick={() => setFilter("Urgente")}
+              >
+                Urgente({urgentCount})
+              </button>
+              <button
+                className={`btn btn-soft ${
+                  filter === "Moyenne" ? "btn-primary" : ""
+                }`}
+                onClick={() => setFilter("Moyenne")}
+              >
+                Moyenne({mediumCount})
+              </button>
+              <button
+                className={`btn btn-soft ${
+                  filter === "Basse" ? "btn-primary" : ""
+                }`}
+                onClick={() => setFilter("Basse")}
+              >
+                Basse({lowCount})
+              </button>
+            </div>
             <button
-              className={`btn btn-soft ${
-                filter === "Tous" ? "btn-primary" : ""
-              }`}
-              onClick={() => setFilter("Tous")}
+              className="btn btn-primary"
+              disabled={selectedTodos.size == 0}
+              onClick={finishSelected}
             >
-              Tous({totalCount})
-            </button>
-            <button
-              className={`btn btn-soft ${
-                filter === "Urgente" ? "btn-primary" : ""
-              }`}
-              onClick={() => setFilter("Urgente")}
-            >
-              Urgente({urgentCount})
-            </button>
-            <button
-              className={`btn btn-soft ${
-                filter === "Moyenne" ? "btn-primary" : ""
-              }`}
-              onClick={() => setFilter("Moyenne")}
-            >
-              Moyenne({mediumCount})
-            </button>
-            <button
-              className={`btn btn-soft ${
-                filter === "Basse" ? "btn-primary" : ""
-              }`}
-              onClick={() => setFilter("Basse")}
-            >
-              Basse({lowCount})
+              Finir la sélection ({selectedTodos.size})
             </button>
           </div>
 
@@ -133,6 +157,7 @@ const App: React.FC = () => {
                     todo={todo}
                     onDelete={() => deleteTodo(todo.id)}
                     isSelected={selectedTodos.has(todo.id)}
+                    onToggleSelect={toggleSelectTodo}
                   />
                 </li>
               ))}
